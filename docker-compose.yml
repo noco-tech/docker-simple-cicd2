@@ -5,14 +5,20 @@ services:
     build: ./api
     ports:
       - "8080:8080"
+    tty: true #コンテナ内でコマンドを実行するために必要bashが起動してすぐ終了しないようにする -tと同じ
     volumes:
       - ./api:/workspace:cached #cachedについては https://docs.docker.jp/docker-for-mac/osxfs-caching.html
 
   web:
     container_name: web
-    build: ./web
+    build:
+      context: ./web
+      target: base
     ports:
       - "3000:3000"
+    environment:
+      - REACT_APP_API_SERVER=http://localhost:8080/api
+    tty: true
     volumes:
       - ./web:/workspace:cached
     depends_on:
