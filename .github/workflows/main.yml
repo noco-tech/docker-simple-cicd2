@@ -13,6 +13,7 @@ env:
 permissions:
   contents: read
 
+
 jobs:
   web-test-build-image:
     name: Web Container - Test and Build
@@ -26,8 +27,8 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Build an Image and Run Tests
-        run:
-          docker image build --target production -t temp_web_image_name:latest --build-arg REACT_APP_API_SERVER=api .
+        run: |
+          docker image build --target production -t temp_web_image_name:latest --build-arg REACT_APP_API_SERVER=/api .
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -44,7 +45,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.AWS_ECR_WEB_SERVER_REPOSITORY }}
-        run:
+        run: |
           docker image tag temp_web_image_name:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
@@ -60,7 +61,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Build an Image and Run Tests
-        run:
+        run: |
           docker image build --target production -t temp_api_image_name:latest .
 
       - name: Configure AWS credentials
@@ -78,7 +79,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.AWS_ECR_API_SERVER_REPOSITORY }}
-        run:
+        run: |
           docker image tag temp_api_image_name:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
@@ -125,10 +126,6 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
-
-
-
-
 
 # Web Container Build/Test
 ## Get Source
